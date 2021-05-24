@@ -1,19 +1,19 @@
 # NetDog
-Mini Stealthy Reverse Shell
+Mini Stealthy Evil Shell
 
 ## Roadmap
 - Reverse Shell
+    - [x] TCP
     - [ ] UDP
+    - [ ] HTTP/S
     - [ ] ICMP
-    - [ ] Multi-sessions
-    - [x] Auto reconnect
+- Bind Shell
+    - [x] TCP
+    - [x] UDP
 - Others
     - [ ] IPv6
-    - [ ] HTTP/S
-        - netdog listen for commands from http server
-        - netdog executes and output to http server until OK is received
-        - netdog also compress the output
-        - E2EE communication
+    - [ ] Encryption
+    - [x] Auto reconnect
     - [ ] SSH backdoor server
 
 ## Choosing binary

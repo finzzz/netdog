@@ -6,8 +6,6 @@ import (
 )
 
 func TCPBind(config Config) {
-	buffer := make([]byte, 1024)
-
 	listener, err := net.Listen("tcp", config.Address)
 	if err != nil {
 		log.Fatalln(err)
@@ -24,6 +22,7 @@ func TCPBind(config Config) {
 		conn.Write([]byte("Connection received on " + conn.RemoteAddr().String() + "\n"))
         
 		for {
+			buffer := make([]byte, MAXBUFFERSIZE)
 			length, err := conn.Read(buffer)
 			if err != nil {
 				break
@@ -50,7 +49,7 @@ func UDPBind(config Config) {
 	log.Println("Listening on " + config.Address)
 
 	for {
-		buffer := make([]byte, 1024)
+		buffer := make([]byte, MAXBUFFERSIZE)
         length, addr, err := listener.ReadFrom(buffer)
         if err != nil {
             log.Println(err)

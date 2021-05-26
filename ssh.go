@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
+	"errors"
+	"crypto/sha256"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -12,7 +15,11 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var hash string
+
 func SSHServer(config Config) {
+	hash = config.Hash
+
 	privateKey, err := generatePrivateKey()
 	if err != nil {
 		log.Fatalln(err)
@@ -32,18 +39,24 @@ func SSHServer(config Config) {
 
 	listener, err := net.Listen("tcp", config.Address)
 	if err != nil {
-		log.Fatalln(err)
+		SSHServer(config)
+		return
 	}
 
 	conn, err := listener.Accept()
 	if err != nil {
 		conn.Close()
+		SSHServer(config)
+		return
 	}
+	defer conn.Close()
 
 	sshConn, chans, _, err := ssh.NewServerConn(conn, &sshConfig)
 	if err != nil {
-		sshConn.Close()
+		SSHServer(config)
+		return
 	}
+	defer sshConn.Close()
 
 	for newChannel := range chans {
 		if newChannel.ChannelType() != "session" {
@@ -57,6 +70,7 @@ func SSHServer(config Config) {
 		}
 		
 		term := terminal.NewTerminal(channel, "> ")
+
 		go func() {
 			defer channel.Close()
 			for {
@@ -70,6 +84,8 @@ func SSHServer(config Config) {
 			}
 		}()
 	}
+
+	SSHServer(config)
 }
 
 func generatePrivateKey() (*rsa.PrivateKey, error) {
@@ -96,5 +112,9 @@ func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 }
 
 func passwordCallback(conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
-	return nil, nil
+	if fmt.Sprintf("%x",sha256.Sum256(password)) == hash {
+		return nil, nil
+	}
+
+	return nil, errors.New("Auth Failed")
 }

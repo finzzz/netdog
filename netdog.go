@@ -3,6 +3,7 @@ package main
 import (
 	"time"
     "flag"
+	"fmt"
 )
 
 type Config struct {
@@ -12,6 +13,7 @@ type Config struct {
 	Mode		string
 	HTTPServer	bool
 	Scheme		string
+	Hash		string
 	Reconnect 	time.Duration
 }
 
@@ -22,7 +24,7 @@ const (
 func main() {
 	var config Config
 	var host, port, reconnect string
-	var udp, tls, async bool
+	var udp, tls bool
 
     flag.StringVar(&host, "host", "127.0.0.1", "Host")
 	flag.StringVar(&port, "port", "1234", "Port")
@@ -32,6 +34,8 @@ func main() {
 
 	flag.BoolVar(&tls, "tls", false, "Enable TLS")
 	flag.BoolVar(&config.HTTPServer, "server", false, "Run as HTTP Server")
+
+	flag.StringVar(&config.Hash, "hash", "", "SHA256 hashed password for SSH authentication")
 
 	flag.StringVar(&reconnect, "recon", "15s", "Reconnecting Time")
     flag.Parse()
@@ -72,6 +76,11 @@ func main() {
 			AsyncHTTPClient(config)
 		}
 	case "ssh" :
+		if config.Hash == "" {
+			fmt.Println("Must specify hashed password \"-hash\"")
+			return
+		}
+
 		SSHServer(config)
 	}
 }

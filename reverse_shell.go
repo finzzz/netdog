@@ -4,7 +4,6 @@ import (
 	"net"
 	"bufio"
 	"time"
-	// "log"
 )
 
 func TCPReverseShell(config Config) {

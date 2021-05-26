@@ -4,18 +4,23 @@ Mini Stealthy Evil Shell
 ## Roadmap
 - Reverse Shell
     - [x] TCP
+        - [ ] TLS
     - [x] UDP
+        - [ ] DTLS
 - Bind Shell
     - [x] TCP
+        - [ ] TLS
     - [x] UDP
+        - [ ] DTLS
+    - [ ] Authentication
 - HTTP shell
-    - [ ] Synchronous
+    - Web Shell (see my other project, [gohfs](https://github.com/finzzz/gohfs))
     - [x] Asynchronous
-    - [ ] TLS
+        - [ ] TLS
+        - [ ] Authentication
 - Others
-    - [ ] IPv6
-    - [ ] Encryption
     - [x] Auto reconnect
+    - [ ] test IPv6
     - [ ] SSH backdoor server
 
 ## Choosing binary

